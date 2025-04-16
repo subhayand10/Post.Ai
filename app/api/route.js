@@ -23,7 +23,7 @@ export async function POST(req) {
     const execAsync = promisify(exec);
     
     // Get the full path to yt-dlp.exe
-    const exePath = path.join(process.cwd(), 'app', 'api', 'yt-dlp');
+    const exePath = path.join(process.cwd(), 'app', 'api', 'yt-dlp_linux');
     
     // Use the full path in the command
     const command = `"${exePath}" -e "${url}"`;
