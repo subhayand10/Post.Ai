@@ -1,7 +1,6 @@
 import { config } from "dotenv";
 import { exec } from "child_process";
 import { promisify } from "util";
-
 config({ path: ".env.local" });
 
 const execPromise = promisify(exec);
