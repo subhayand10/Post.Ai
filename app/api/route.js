@@ -33,7 +33,7 @@ export async function POST(req) {
     }
     ytdl
       .getBasicInfo(
-        "https://www.youtube.com/watch?v=8qBQ0eZEnbY&ab_channel=GamersNexus"
+        url
       )
       .then(async(info) => {
         console.log(info.videoDetails.title);
