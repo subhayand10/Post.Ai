@@ -3,9 +3,21 @@ import { PrismaClient } from "@prisma/client";
 import { exec } from "child_process";
 import { promisify } from "util";
 import path from "path";
+const ytdl = require("@distube/ytdl-core");
+
+// async function getYouTubeTitle(url) {
+//   try {
+//     const info = await ytdl.getInfo(url);
+//     return info.videoDetails.title;
+//   } catch (error) {
+//     console.error("ytdl-core Error:", error);
+//     return null;
+//   }
+// }
 const prisma = new PrismaClient();
 
 export async function POST(req) {
+  // const ytdl = (await import("@distube/ytdl-core")).default;
   try {
     const body = await req.json();
     const url = body.url;
@@ -19,27 +31,19 @@ export async function POST(req) {
     if (!prisma.videos) {
       throw new Error("Model 'videos' is not defined in the Prisma client.");
     }
-
-    const execAsync = promisify(exec);
-    
-    // Get the full path to yt-dlp.exe
-    const exePath = path.join(process.cwd(), 'app', 'api', 'yt-dlp_linux');
-    
-    // Use the full path in the command
-    const command = `"${exePath}" -e "${url}"`;
-    
-    const { stdout } = await execAsync(command, {
-      windowsHide: true,
-    });
-
-    const lines = JSON.stringify(stdout).trim().split("\n");
-    const newVideoTitle = await prisma.videos.create({
-      data: {
-        title: lines[0],
-        urls: [lines[0], url],
-      },
-    });
-    console.log(lines[0])
+    ytdl
+      .getBasicInfo(
+        "https://www.youtube.com/watch?v=8qBQ0eZEnbY&ab_channel=GamersNexus"
+      )
+      .then(async(info) => {
+        console.log(info.videoDetails.title);
+        const newVideoTitle = await prisma.videos.create({
+          data: {
+            title: info.videoDetails.title,
+            urls: [info.videoDetails.title, url],
+          },
+        });
+      });
     const transcript = await YoutubeTranscript.fetchTranscript(url);
 
     return new Response(JSON.stringify(transcript), {
